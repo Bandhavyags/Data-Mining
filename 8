@@ -1,0 +1,31 @@
+import pandas as pd
+from sklearn.preprocessing import LabelEncoder
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.model_selection import cross_val_score
+
+data = pd.read_csv("/content/drive/MyDrive/Colab Notebooks/german_credit.csv")
+
+le = LabelEncoder()
+for col in data.columns:
+ if data[col].dtype == object:
+    data[col] = le.fit_transform(data[col].astype(str))
+
+X = data.iloc[:,:-1]
+y = data.iloc[:,-1]
+
+
+print(f"{'Depth':<12} {'Train Acc':>12} {'CV Acc':>10}")
+print("-" * 48)
+
+for depth in [1, 2, 3, 4, 5, 6, 8, 10, None]:
+ model = DecisionTreeClassifier(criterion='entropy',max_depth=depth, random_state=42)
+ model.fit(X, y)
+ train_acc = model.score(X, y)
+ cv_acc = cross_val_score(model, X, y, cv=10).mean()
+ label = str(depth) if depth else "Full"
+ print(f"{label:<12} {train_acc*100:>11.2f}% {cv_acc*100:>9.2f}%")
+
+print("\nConclusion:")
+print(" Shallow tree -> High Bias, Low Variance -> Underfitting")
+print(" Deep tree -> Low Bias, High Variance -> Overfitting")
+print(" Best practice: Use max_depth=4-6 with cross-validation")
