@@ -1,0 +1,20 @@
+
+import pandas as pd
+from sklearn.preprocessing import LabelEncoder
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.model_selection import cross_val_score
+
+data = pd.read_csv("/content/drive/MyDrive/Colab Notebooks/german_credit.csv")
+le = LabelEncoder()
+
+for col in data.columns:
+ if data[col].dtype == object:
+  data[col] = le.fit_transform(data[col])
+
+X = data.iloc[:, :-1]
+y = data.iloc[:, -1]
+
+model = DecisionTreeClassifier(criterion='entropy', random_state=42)
+scores = cross_val_score(model, X, y, cv=10)
+print("CV Accuracy per fold:", scores)
+print(f"Average Accuracy : {scores.mean()*100:.2f}%")
