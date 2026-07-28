@@ -1,0 +1,27 @@
+# PROGRAM 6: Attribute Selection — Fewer Attributes
+# Use only selected attributes (2,3,5,7,10,17) and check if accuracy changes.
+
+import pandas as pd
+from sklearn.preprocessing import LabelEncoder
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.model_selection import cross_val_score
+
+data = pd.read_csv("/content/drive/MyDrive/Colab Notebooks/german_credit.csv")
+le = LabelEncoder()
+
+for col in data.columns:
+    if data[col].dtype == object:
+        data[col] = le.fit_transform(data[col])
+
+# Select attributes by position (2,3,5,7,10,17)
+selected = [1, 2, 4, 6, 9, 16]
+
+X = data.iloc[:, selected]
+y = data.iloc[:, -1]
+
+model = DecisionTreeClassifier(criterion='entropy', random_state=42)
+scores = cross_val_score(model, X, y, cv=10)
+
+print("Selected Attribute Positions:", [2, 3, 5, 7, 10, 17])
+print("Accuracy per fold:", scores)
+print(f"Average Accuracy: {scores.mean()*100:.2f}%")
